@@ -1,5 +1,13 @@
 # Token for access REST service
 rest-auth-token=CHANGE-ME
 
-# Auth token for telegram bot
+#-----------------------------------
+# TELEGRAM
+#-----------------------------------
+
+# Bot auth token
 telegram-bot.auth-token=CHANGE-ME
+
+# Chat ID's
+# Example: 351235|59325823|239418
+telegram-bot.chat-ids=CHANGE-ME
