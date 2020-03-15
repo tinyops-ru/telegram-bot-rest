@@ -1,0 +1,5 @@
+# Token for access REST service
+rest-auth-token=CHANGE-ME
+
+# Auth token for telegram bot
+telegram-bot.auth-token=CHANGE-ME
