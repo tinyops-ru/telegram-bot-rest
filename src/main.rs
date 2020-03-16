@@ -5,6 +5,7 @@ extern crate log4rs;
 use std::env;
 
 use crate::config::config::load_from_file;
+use crate::filters::filters::routes;
 use crate::logging::logging::get_logging_config;
 
 const VERSION: &str = "0.1.0";
@@ -13,6 +14,8 @@ const TELEGRAM_API_BASE_URL: &str = "https://api.telegram.org/bot";
 
 mod config;
 mod config_tests;
+
+mod filters;
 
 mod logging;
 
@@ -31,54 +34,13 @@ async fn main() {
 
             let port = *&config.port;
 
-            let routes = filters::routes(config);
+            let routes = routes(config);
 
             warp::serve(routes)
                 .run(([127, 0, 0, 1], port))
                 .await;
         }
         Err(_error) => println!("error: unable to load config from file")
-    }
-}
-
-mod filters {
-    use warp::Filter;
-
-    use crate::config::config::Config;
-
-    use super::handlers;
-
-    const HEADER_AUTH_TOKEN: &str = "token";
-
-    pub fn routes(config: Config) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-        return send_message(config)
-               .or(get_version())
-    }
-
-    pub fn send_message(config: Config) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-        let rest_auth_token = String::from(config.rest_auth_token.clone());
-        let authenticated = warp::header::exact(HEADER_AUTH_TOKEN, string_to_static_str(rest_auth_token));
-
-        return  warp::path!("rest" / "send")
-            .and(authenticated)
-            .and(warp::post())
-            .and(with_config(config.clone()))
-            .and(warp::body::form())
-            .and_then(handlers::send_message)
-    }
-
-    pub fn get_version() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-        return warp::path!("version")
-            .and(warp::get())
-            .and_then(handlers::get_version)
-    }
-
-    fn with_config(config: Config) -> impl Filter<Extract = (Config,), Error = std::convert::Infallible> + Clone {
-        warp::any().map(move || config.clone())
-    }
-
-    fn string_to_static_str(s: String) -> &'static str {
-        Box::leak(s.into_boxed_str())
     }
 }
 
