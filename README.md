@@ -10,6 +10,19 @@ Edit config file.
 
 Run app.
 
+## Send message
+
+### Curl
+
+```shell script
+curl --location --request POST 'http://your-server:31419/rest/send' \
+--header 'token: YOUR-REST-TOKEN' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'message=dGVlZXN0'
+```
+
+Message should be encoded with Base64. In example: dGVlZXN0 = teeest
+
 ## Proxy support
 
 Add environment variables:
