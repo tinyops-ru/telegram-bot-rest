@@ -52,11 +52,19 @@ mod filters {
     }
 
     pub fn send_message(config: Config) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+        let rest_auth_token = String::from(config.rest_auth_token.clone());
+        let authenticated = warp::header::exact("token", string_to_static_str(rest_auth_token));
+
         return  warp::path!("rest" / "send")
+            .and(authenticated)
             .and(warp::post())
             .and(with_config(config.clone()))
             .and(warp::body::form())
             .and_then(handlers::send_message)
+    }
+
+    fn string_to_static_str(s: String) -> &'static str {
+        Box::leak(s.into_boxed_str())
     }
 
     pub fn get_version() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
