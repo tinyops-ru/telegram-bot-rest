@@ -1,20 +1,28 @@
-# Telegram Bot REST
+# Telegram Bot REST Service
 
-REST сервис для отправки сообщений через Telegram бота.
+REST service for Telegram Bot.
 
-## С чего начать
+## Getting started
 
-Скопировать `telegram-bot.conf-dist` в `telegram-bot.conf`.
+Copy example file `telegram-bot.conf-dist` to `telegram-bot.conf`.
 
-Указать данные настроек внутри конфигурационного файла.
+Edit config file.
 
-Запустить.
+Run app.
 
-## Поддержка Proxy
+## Proxy support
 
-Добавляем переменные окружения вида:
+Add environment variables:
 
+```
 HTTP_PROXY=http://yourhost:3128
 HTTPS_PROXY=http://yourhost:3128
+```
 
-Запускаем приложение.
+Run app.
+
+## How to build app from source
+
+```shell script
+cargo build --release
+```
