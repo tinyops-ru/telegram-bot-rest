@@ -5,12 +5,16 @@ pub mod config {
 
     use regex::Regex;
 
+    const DEFAULT_PORT: u16 = 31419;
+
+    const PORT_PROPERTY: &str = "port";
     const REST_AUTH_TOKEN_PROPERTY: &str = "rest-auth-token";
     const TELEGRAM_BOT_AUTH_TOKEN_PROPERTY: &str = "telegram-bot.auth-token";
     const TELEGRAM_CHAT_IDS_PROPERTY: &str = "telegram-bot.chat-ids";
 
     #[derive(Clone)]
     pub struct Config {
+        pub port: u16,
         pub rest_auth_token: String,
         pub telegram_bot_token: String,
         pub telegram_chat_ids: Vec<i32>
@@ -22,16 +26,26 @@ pub mod config {
         let input = File::open(file_name).expect("unable to load config from file");
         let buffered = BufReader::new(input);
 
+        let mut port: u16 = DEFAULT_PORT;
         let mut rest_auth_token: String = String::from("");
         let mut telegram_bot_auth_token: String = String::from("");
         let mut telegram_chat_ids: Vec<i32> = Vec::new();
 
+        let port_regex = get_property_regex(PORT_PROPERTY);
         let rest_auth_token_regex = get_property_regex(REST_AUTH_TOKEN_PROPERTY);
         let telegram_bot_auth_token_regex = get_property_regex(TELEGRAM_BOT_AUTH_TOKEN_PROPERTY);
         let telegram_chat_ids_regex = get_property_regex(TELEGRAM_CHAT_IDS_PROPERTY);
 
         for line in buffered.lines() {
             let row = line.unwrap();
+
+            if port_regex.is_match(&row) {
+                let groups_matches = port_regex.captures_iter(&row).next();
+                let groups = groups_matches.unwrap();
+
+                port = String::from(&groups[1]).parse::<u16>().unwrap();
+                info!("port '{}'", port);
+            }
 
             if rest_auth_token_regex.is_match(&row) {
                 let groups_matches = rest_auth_token_regex.captures_iter(&row).next();
@@ -68,6 +82,7 @@ pub mod config {
         }
 
         let config = Config {
+            port,
             rest_auth_token: String::from(rest_auth_token),
             telegram_bot_token: String::from(telegram_bot_auth_token),
             telegram_chat_ids

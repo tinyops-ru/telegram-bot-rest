@@ -3,6 +3,16 @@ mod config_tests {
     use crate::config::config::load_from_file;
 
     #[test]
+    fn result_config_should_contain_port_if_defined() {
+        match load_from_file("tests/telegram-bot.conf") {
+            Ok(config) => {
+                assert_eq!(config.port, 12345);
+            }
+            Err(_error) => panic!("property value expected")
+        }
+    }
+
+    #[test]
     fn result_config_should_contain_rest_auth_token() {
         match load_from_file("tests/telegram-bot.conf") {
             Ok(config) => {
@@ -25,6 +35,19 @@ mod config_tests {
     #[test]
     fn result_config_should_contain_telegram_chat_ids() {
         match load_from_file("tests/telegram-bot.conf") {
+            Ok(config) => {
+                let expected_chat_id1: i32 = 123456;
+                assert_eq!(config.telegram_chat_ids.contains(&expected_chat_id1), true);
+                let expected_chat_id2: i32 = 77712;
+                assert_eq!(config.telegram_chat_ids.contains(&expected_chat_id2), true);
+            }
+            Err(_error) => panic!("property value expected")
+        }
+    }
+
+    #[test]
+    fn use_default_port_if_was_not_defined_in_config_file() {
+        match load_from_file("tests/telegram-bot-undefined-port.conf") {
             Ok(config) => {
                 let expected_chat_id1: i32 = 123456;
                 assert_eq!(config.telegram_chat_ids.contains(&expected_chat_id1), true);
@@ -62,5 +85,11 @@ mod config_tests {
     #[should_panic]
     fn return_error_if_telegram_bot_chat_ids_is_empty() {
         assert_eq!(load_from_file("tests/telegram-bot-empty-chat-ids.conf").is_err(), true);
+    }
+
+    #[test]
+    #[should_panic]
+    fn return_error_if_port_value_is_invalid() {
+        assert_eq!(load_from_file("tests/telegram-bot-invalid-port.conf").is_err(), true);
     }
 }

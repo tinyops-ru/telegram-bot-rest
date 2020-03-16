@@ -27,10 +27,12 @@ async fn main() {
         Ok(config) => {
             info!("config has been loaded from file");
 
+            let port = *&config.port;
+
             let routes = filters::routes(config);
 
             warp::serve(routes)
-                .run(([127, 0, 0, 1], 31419))
+                .run(([127, 0, 0, 1], port))
                 .await;
         }
         Err(_error) => println!("error: unable to load config from file")
@@ -75,8 +77,8 @@ mod handlers {
 
     use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 
-    use crate::TELEGRAM_API_BASE_URL;
     use crate::config::config::Config;
+    use crate::TELEGRAM_API_BASE_URL;
 
     pub async fn get_version() -> Result<impl warp::Reply, Infallible> {
         let version = "0.1.0";

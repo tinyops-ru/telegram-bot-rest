@@ -1,3 +1,6 @@
+# Port for REST service
+# port=31419
+
 # Token for access REST service
 rest-auth-token=CHANGE-ME
 
