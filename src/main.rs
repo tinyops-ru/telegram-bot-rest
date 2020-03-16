@@ -30,7 +30,7 @@ async fn main() {
             let routes = filters::routes(config);
 
             warp::serve(routes)
-                .run(([127, 0, 0, 1], 3030))
+                .run(([127, 0, 0, 1], 31419))
                 .await;
         }
         Err(_error) => println!("error: unable to load config from file")
