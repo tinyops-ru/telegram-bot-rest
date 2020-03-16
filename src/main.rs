@@ -48,6 +48,8 @@ mod filters {
 
     use super::handlers;
 
+    const HEADER_AUTH_TOKEN: &str = "token";
+
     pub fn routes(config: Config) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
         return send_message(config)
                .or(get_version())
@@ -55,7 +57,7 @@ mod filters {
 
     pub fn send_message(config: Config) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
         let rest_auth_token = String::from(config.rest_auth_token.clone());
-        let authenticated = warp::header::exact("token", string_to_static_str(rest_auth_token));
+        let authenticated = warp::header::exact(HEADER_AUTH_TOKEN, string_to_static_str(rest_auth_token));
 
         return  warp::path!("rest" / "send")
             .and(authenticated)
