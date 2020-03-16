@@ -2,7 +2,7 @@ pub mod filters {
     use warp::Filter;
 
     use crate::config::config::Config;
-    use crate::handlers;
+    use crate::handlers::handlers;
 
     const HEADER_AUTH_TOKEN: &str = "token";
 
