@@ -7,6 +7,8 @@ use std::env;
 use crate::config::config::load_from_file;
 use crate::logging::logging::get_logging_config;
 
+const VERSION: &str = "0.1.0";
+
 const TELEGRAM_API_BASE_URL: &str = "https://api.telegram.org/bot";
 
 mod config;
@@ -63,10 +65,6 @@ mod filters {
             .and_then(handlers::send_message)
     }
 
-    fn string_to_static_str(s: String) -> &'static str {
-        Box::leak(s.into_boxed_str())
-    }
-
     pub fn get_version() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
         return warp::path!("version")
             .and(warp::get())
@@ -75,6 +73,10 @@ mod filters {
 
     fn with_config(config: Config) -> impl Filter<Extract = (Config,), Error = std::convert::Infallible> + Clone {
         warp::any().map(move || config.clone())
+    }
+
+    fn string_to_static_str(s: String) -> &'static str {
+        Box::leak(s.into_boxed_str())
     }
 }
 
@@ -85,20 +87,17 @@ mod handlers {
 
     use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 
+    use crate::{TELEGRAM_API_BASE_URL, VERSION};
     use crate::config::config::Config;
-    use crate::TELEGRAM_API_BASE_URL;
+
+    const MESSAGE_FORM_KEY: &str = "message";
 
     pub async fn get_version() -> Result<impl warp::Reply, Infallible> {
-        let version = "0.1.0";
-        Ok(warp::reply::html(version))
+        Ok(warp::reply::html(VERSION))
     }
 
     pub async fn send_message(config: Config, form: HashMap<String, String>) -> Result<impl warp::Reply, Infallible> {
-        for key in form.keys() {
-            debug!("{}", key);
-        }
-
-        let message_encoded = form.get("message").unwrap();
+        let message_encoded = form.get(MESSAGE_FORM_KEY).unwrap();
 
         let message = base64::decode(message_encoded).unwrap();
 
@@ -118,7 +117,7 @@ mod handlers {
 
             debug!("response text '{}'", response_text);
 
-            if status == 200 {
+            if status == reqwest::StatusCode::OK {
                 info!("message has been sent");
 
             } else {
@@ -133,8 +132,4 @@ mod handlers {
         let url_encoded_message = utf8_percent_encode(message, NON_ALPHANUMERIC).to_string();
         return format!("{}{}/sendMessage?chat_id={}&disable_web_page_preview=true&text={}", TELEGRAM_API_BASE_URL, auth_token, chat_id, url_encoded_message)
     }
-}
-
-mod models {
-
 }
