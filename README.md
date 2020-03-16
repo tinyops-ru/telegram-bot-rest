@@ -23,6 +23,29 @@ Run app.
 
 ## How to build app from source
 
+### CentOS 7
+
+Install environment dependencies:
+
+```shell script
+yum group install 'Development Tools'
+yum install openssl-devel
+```
+
+Build:
+
+```shell script
+cargo build --release
+```
+
+### Windows
+
+Remove dependency `openssl` from `Cargo.toml`.
+
+Then build:
+
+Build:
+
 ```shell script
 cargo build --release
 ```
