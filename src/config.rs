@@ -67,22 +67,32 @@ pub mod config {
             }
         }
 
-        if rest_auth_token != "" && telegram_bot_auth_token != "" {
-            Ok(
-                Config {
-                    rest_auth_token: String::from(rest_auth_token),
-                    telegram_bot_token: String::from(telegram_bot_auth_token),
-                    telegram_chat_ids
-                }
-            )
+        let config = Config {
+            rest_auth_token: String::from(rest_auth_token),
+            telegram_bot_token: String::from(telegram_bot_auth_token),
+            telegram_chat_ids
+        };
 
-        } else {
-            panic!("one or more configuration properties are missing")
-        }
+        if is_config_valid(&config) {
+            Ok(config)
+
+        } else { panic!("invalid configuration") }
     }
 
     fn get_property_regex(property_name: &str) -> Regex {
         let pattern = format!("^{}=(.*)", property_name);
         return Regex::new(&pattern).unwrap();
+    }
+
+    fn is_config_valid(config: &Config) -> bool {
+        let mut result = false;
+
+        if config.rest_auth_token != "" && config.telegram_bot_token != "" &&
+           !config.telegram_chat_ids.is_empty() {
+            result = true
+
+        } else { error!("one or more configuration properties are missing") }
+
+        return result;
     }
 }
