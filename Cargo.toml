@@ -13,6 +13,8 @@ reqwest = { version = "0.10", features = ["json"] }
 base64 = "0.12"
 percent-encoding = "2.1.0"
 
+openssl = { version = "0.10", features = ["vendored"] }
+
 regex = "1"
 
 log = "0.4.8"
